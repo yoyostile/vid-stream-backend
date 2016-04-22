@@ -5,3 +5,6 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+user = User.create device_uuid: SecureRandom.uuid
+Stream.create user: user, lat: 50.9333333, lng: 6.95
