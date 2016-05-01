@@ -1,0 +1,56 @@
+.row
+  .col-md-12
+    %h1 index
+    .col-md-6
+      %form#create
+        = text_field_tag :channel
+        = submit_tag :create
+      %form#join
+        = text_field_tag :channel
+        = submit_tag :join
+
+    .col-md-6.streams
+
+.row
+  .col-md-12
+    %video.video-container
+
+  - if false
+    .table-responsive
+      %table.table
+        %thead
+          %th public_id
+          %th created_at
+          %th updated_at
+          %th user_id
+          %th lat
+          %th lng
+          %th active
+        %tbody
+          - @streams.each do |stream|
+            %tr
+              %td= link_to stream.public_id, stream
+              %td= stream.created_at
+              %td= stream.updated_at
+              %td= stream.user_id
+              %td= stream.lat
+              %td= stream.lng
+              %td= stream.active
+
+:coffee
+  $ ->
+    streams = $.get 'http://ngnsignaling.r4r3.me', (data) ->
+      console.log data
+      $('.streams').html JSON.stringify data
+
+    $('form#create').on 'submit', (e) ->
+      e.preventDefault()
+      channel = $('#create #channel').val()
+      stream = new Stream channel
+      stream.createStream()
+
+    $('form#join').on 'submit', (e) ->
+      e.preventDefault()
+      channel = $('#join #channel').val()
+      stream = new Stream channel
+      stream.joinStream()

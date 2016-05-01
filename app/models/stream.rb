@@ -5,8 +5,11 @@ class Stream < ActiveRecord::Base
 
   scope :all_active, -> () { where(active: true) }
 
-  private
+  def to_param
+    self.public_id
+  end
 
+  private
   def set_public_uuid
     self.public_id = SecureRandom.uuid
   end
