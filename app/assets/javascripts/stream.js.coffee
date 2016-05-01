@@ -1,5 +1,5 @@
 class @SignalingChannel
-  socket = io('http://ngnsignaling.r4r3.me')
+  socket = io('https://ngnsignaling.r4r3.me')
 
   send: (user, msg) ->
     socket.emit 'sendMessage', user, msg
