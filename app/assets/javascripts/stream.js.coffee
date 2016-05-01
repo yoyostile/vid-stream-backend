@@ -42,9 +42,11 @@ class @Peer
     @signalingChannel.getSocket().on 'messageReceived', @handleMessage
     @createOffer @user if @user
 
-    @conn.onicecandidate = (e) =>
-      if e.candidate && @user
-        @signalingChannel.send @user, JSON.stringify({ "candidate": e.candidate })
+    unless @user
+      @conn.onicecandidate = (e) =>
+        if e.candidate && @user
+          console.log 'icecandi'
+          @signalingChannel.send @user, JSON.stringify({ "candidate": e.candidate })
 
   getConnection: ->
     @conn
@@ -74,6 +76,7 @@ class @Peer
     if msg.sdp
       @.conn.setRemoteDescription new RTCSessionDescription(msg.sdp), =>
         if @.conn.remoteDescription.type == 'offer'
+          @.user = user
           @.createAnswer user
     else
       @.conn.addIceCandidate new RTCIceCandidate(msg.candidate)
