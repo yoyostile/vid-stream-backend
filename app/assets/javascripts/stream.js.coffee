@@ -16,7 +16,7 @@ class @Connection
   }
 
   @TURN: {
-    url: 'turn:ec2-52-31-83-4.eu-west-1.compute.amazonaws.com',
+    url: 'turn:5d3435fc-09fe-4ba6-8730-36d07924a5a0.pub.cloud.scaleway.com',
     username: 'johannes',
     password: 'johannes'
   }
@@ -41,6 +41,7 @@ class @Peer
     @conn.addStream stream if stream
     @signalingChannel.getSocket().on 'messageReceived', @handleMessage
     @createOffer @user if @user
+    @connectedUser = undefined
 
     @conn.onicecandidate = (e) =>
       if e.candidate && @user
@@ -51,34 +52,39 @@ class @Peer
 
   createAnswer: (user) =>
     localDescCreated = (desc) =>
-      @.conn.setLocalDescription desc
-      @.signalingChannel.send user, JSON.stringify({ "sdp": desc })
+      @conn.setLocalDescription desc
+      @signalingChannel.send user, JSON.stringify({ "sdp": desc })
       console.log desc
 
-    @.conn.createAnswer localDescCreated, (e) ->
+    @conn.createAnswer localDescCreated, (e) ->
       console.log 'answer: ' + e
 
   createOffer: (user) =>
     gotDescription = (desc) =>
-      @.conn.setLocalDescription desc
-      @.signalingChannel.send user, JSON.stringify({ "sdp": desc })
+      @conn.setLocalDescription desc
+      @signalingChannel.send user, JSON.stringify({ "sdp": desc })
 
-    @.conn.createOffer gotDescription, (error) ->
+    @conn.createOffer gotDescription, (error) ->
       console.log 'error: ' + error
 
   handleMessage: (msg) =>
     user = msg.user
+    @connectedUser = user if @connectedUser == undefined
     msg = JSON.parse(msg.message)
     console.log 'messageReceived from ' + user
     console.log msg
-    if msg.sdp
-      @.conn.setRemoteDescription new RTCSessionDescription(msg.sdp), =>
-        if @.conn.remoteDescription.type == 'offer'
-          @.user = user
-          @.createAnswer user
-    else if msg.candidate
-      console.log 'added candidate for ' + user
-      @.conn.addIceCandidate new RTCIceCandidate(msg.candidate)
+    console.log 'connection status ' + @conn.iceConnectionState
+    console.log 'Stream connected? ' + @streamConnected
+    if user == @connectedUser
+      if msg.sdp
+        @conn.setRemoteDescription new RTCSessionDescription(msg.sdp), =>
+          if @conn.remoteDescription.type == 'offer'
+            @user = user
+            @createAnswer user
+            @streamConnected = true
+      else if msg.candidate
+        console.log 'added candidate for ' + user
+        @conn.addIceCandidate new RTCIceCandidate(msg.candidate)
 
 class @Stream
   constructor: (streamName) ->
@@ -93,11 +99,11 @@ class @Stream
       audio: true,
       video: true
     }, (stream) =>
-      @.signalingChannel.login @.streamName
-      @.videoContainer.src = URL.createObjectURL stream
-      @.videoContainer.play()
-      # @.conn.addStream stream
-      @.stream = stream
+      @signalingChannel.login @streamName
+      @videoContainer.src = URL.createObjectURL stream
+      @videoContainer.play()
+      # @conn.addStream stream
+      @stream = stream
     , (stream) ->
       console.log 'lulz error'
       console.log stream
@@ -105,11 +111,11 @@ class @Stream
     console.log 'Adding join Listener to Socket'
     @signalingChannel.getSocket().on 'join', (user) =>
       console.log 'join: ' + user
-      @.peers << new Peer @.signalingChannel, @.stream, user
+      @peers << new Peer @signalingChannel, @stream, user
 
 
   joinStream: ->
-    @signalingChannel.login @.streamName
+    @signalingChannel.login @streamName
     socket = @signalingChannel.getSocket()
     broadcaster = new Peer @signalingChannel
 
@@ -119,7 +125,11 @@ class @Stream
 
     broadcaster.getConnection().onaddstream = (e) =>
       console.log e
-      @.videoContainer.src = URL.createObjectURL e.stream
-      @.videoContainer.play()
+      @videoContainer.src = URL.createObjectURL e.stream
+      @videoContainer.play()
+
+      @signalingChannel.getSocket().on 'join', (user) =>
+        console.log 'join: ' + user
+        @peers << new Peer @signalingChannel, e.stream.clone(), user
 
     true
