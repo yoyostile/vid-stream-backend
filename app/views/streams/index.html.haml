@@ -1,6 +1,6 @@
 .row
   .col-md-12
-    %h1 index
+    %h1 Streams
     .col-md-6
       %form#create
         = text_field_tag :channel
@@ -39,9 +39,25 @@
 
 :coffee
   $ ->
-    streams = $.get 'https://ngnsignaling.r4r3.me', (data) ->
-      console.log data
-      $('.streams').html JSON.stringify data
+    roomsToLinks = (data) ->
+      s = ""
+      for k,v of data
+        s += "<a href='#' data-room='" + k + "'>" + k + "</a><br>"
+      s
+
+    streams = $.get 'http://localhost:5000', (data) ->
+      for k,v of data
+        if k.match(/^\/#.*/)?
+          delete data[k]
+
+
+      $('.streams').append roomsToLinks(data)
+
+    $(document).on 'click', 'a[data-room]', (e) ->
+      e.preventDefault()
+      room = $(@).data('room')
+      stream = new Stream room
+      stream.joinStream()
 
     $('form#create').on 'submit', (e) ->
       e.preventDefault()
