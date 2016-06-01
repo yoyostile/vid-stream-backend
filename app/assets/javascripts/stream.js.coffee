@@ -54,10 +54,10 @@ class @Peer
     localDescCreated = (desc) =>
       @conn.setLocalDescription desc
       @signalingChannel.send user, JSON.stringify({ "sdp": desc })
-      console.log desc
+      # console.log desc
 
     @conn.createAnswer localDescCreated, (e) ->
-      console.log 'answer: ' + e
+      # console.log 'answer: ' + e
 
   createOffer: (user) =>
     gotDescription = (desc) =>
@@ -70,11 +70,12 @@ class @Peer
   handleMessage: (msg) =>
     user = msg.user
     @connectedUser = user if @connectedUser == undefined
+    console.log "connected to: " + @connectedUser
     msg = JSON.parse(msg.message)
-    console.log 'messageReceived from ' + user
-    console.log msg
-    console.log 'connection status ' + @conn.iceConnectionState
-    console.log 'Stream connected? ' + @streamConnected
+    # console.log 'messageReceived from ' + user
+    # console.log msg
+    # console.log 'connection status ' + @conn.iceConnectionState
+    # console.log 'Stream connected? ' + @streamConnected
     if user == @connectedUser
       if msg.sdp
         @conn.setRemoteDescription new RTCSessionDescription(msg.sdp), =>
@@ -83,7 +84,7 @@ class @Peer
             @createAnswer user
             @streamConnected = true
       else if msg.candidate
-        console.log 'added candidate for ' + user
+        # console.log 'added candidate for ' + user
         @conn.addIceCandidate new RTCIceCandidate(msg.candidate)
 
 class @Stream
@@ -105,8 +106,8 @@ class @Stream
       # @conn.addStream stream
       @stream = stream
     , (stream) ->
-      console.log 'lulz error'
-      console.log stream
+      # console.log 'lulz error'
+      # console.log stream
 
     console.log 'Adding join Listener to Socket'
     @signalingChannel.getSocket().on 'join', (user) =>
@@ -124,12 +125,13 @@ class @Stream
       console.log msg
 
     broadcaster.getConnection().onaddstream = (e) =>
-      console.log e
-      @videoContainer.src = URL.createObjectURL e.stream
-      @videoContainer.play()
+      if @videoContainer.src == ""
+        @videoContainer.src = URL.createObjectURL e.stream
+        @videoContainer.play()
+        console.log "Offering replicated Stream"
 
-      @signalingChannel.getSocket().on 'join', (user) =>
-        console.log 'join: ' + user
-        @peers << new Peer @signalingChannel, e.stream.clone(), user
+        @signalingChannel.getSocket().on 'join', (user) =>
+          console.log 'join: ' + user
+          @peers << new Peer @signalingChannel, e.stream.clone(), user
 
     true
