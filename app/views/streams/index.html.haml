@@ -45,7 +45,7 @@
         s += "<a href='#' data-room='" + k + "'>" + k + "</a><br>"
       s
 
-    streams = $.get 'http://localhost:5000', (data) ->
+    streams = $.get 'https://ngnsignaling.r4r3.me', (data) ->
       for k,v of data
         if k.match(/^\/#.*/)?
           delete data[k]
