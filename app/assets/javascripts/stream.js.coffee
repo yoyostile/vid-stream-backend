@@ -142,6 +142,6 @@ class @Stream
 
         @signalingChannel.getSocket().on 'join', (user) =>
           console.log 'join: ' + user
-          @peers << new Peer @signalingChannel, e.stream.clone(), user
+          @peers << new Peer @signalingChannel, e.stream, user
 
     true
