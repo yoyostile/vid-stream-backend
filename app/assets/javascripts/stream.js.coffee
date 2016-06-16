@@ -45,8 +45,8 @@ class @Peer
 
     @conn.onicecandidate = (e) =>
       if e.candidate && @user
-        console.log "Ice Candidate:"
-        console.log e.candidate
+        # console.log "Ice Candidate:"
+        # console.log e.candidate
         @signalingChannel.send @user, JSON.stringify({ "candidate": e.candidate })
 
   getConnection: ->
@@ -86,7 +86,8 @@ class @Peer
             @createAnswer user
             @streamConnected = true
       else if msg.candidate
-        # console.log 'added candidate for ' + user
+        console.log 'added candidate for ' + user
+        console.log msg.candidate
         @conn.addIceCandidate new RTCIceCandidate(msg.candidate)
 
 class @Stream
