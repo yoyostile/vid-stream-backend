@@ -15,15 +15,16 @@ class @Connection
     url: 'stun:stun.l.google.com:19302'
   }
 
-  # @TURN: {
-  #   url: 'turn:5d3435fc-09fe-4ba6-8730-36d07924a5a0.pub.cloud.scaleway.com',
-  #   username: 'johannes',
-  #   credential: 'johannes'
-  # }
+  @TURN: {
+    url: 'turn:5d3435fc-09fe-4ba6-8730-36d07924a5a0.pub.cloud.scaleway.com',
+    username: 'johannes',
+    credential: 'johannes',
+    credentialType: 'password'
+  }
 
   constructor: ->
     config = {
-      iceServers: [Connection.STUN]
+      iceServers: [Connection.STUN, Connection.TURN]
     }
     @conn = new webkitRTCPeerConnection config
     console.log @conn
