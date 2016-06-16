@@ -11,9 +11,9 @@ class @SignalingChannel
     socket
 
 class @Connection
-  @STUN: {
-    url: 'stun:stun.l.google.com:19302'
-  }
+  # @STUN: {
+  #   url: 'stun:stun.l.google.com:19302'
+  # }
 
   @TURN: {
     url: 'turn:5d3435fc-09fe-4ba6-8730-36d07924a5a0.pub.cloud.scaleway.com',
@@ -23,7 +23,7 @@ class @Connection
 
   constructor: ->
     config = {
-      iceServers: [Connection.STUN, Connection.TURN]
+      iceServers: [Connection.TURN]
     }
     @conn = new webkitRTCPeerConnection config
     console.log @conn
