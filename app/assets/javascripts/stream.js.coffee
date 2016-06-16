@@ -45,6 +45,8 @@ class @Peer
 
     @conn.onicecandidate = (e) =>
       if e.candidate && @user
+        console.log "Ice Candidate:"
+        console.log e.candidate
         @signalingChannel.send @user, JSON.stringify({ "candidate": e.candidate })
 
   getConnection: ->
