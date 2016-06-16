@@ -18,7 +18,7 @@ class @Connection
   @TURN: {
     url: 'turn:5d3435fc-09fe-4ba6-8730-36d07924a5a0.pub.cloud.scaleway.com',
     username: 'johannes',
-    password: 'johannes'
+    credential: 'johannes'
   }
 
   constructor: ->
@@ -26,6 +26,7 @@ class @Connection
       iceServers: [Connection.STUN, Connection.TURN]
     }
     @conn = new webkitRTCPeerConnection config
+    console.log @conn
 
   getConnection: ->
     @conn
