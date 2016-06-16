@@ -81,8 +81,8 @@ class @Peer
     console.log 'Stream connected? ' + @streamConnected
     if user == @connectedUser
       if msg.sdp
-        console.log "SDP"
-        console.log msg.sdp
+        # console.log "SDP"
+        # console.log msg.sdp
         @conn.setRemoteDescription new RTCSessionDescription(msg.sdp), =>
           if @conn.remoteDescription.type == 'offer'
             @user = user
@@ -141,7 +141,12 @@ class @Stream
         console.log "Offering replicated Stream"
 
         @signalingChannel.getSocket().on 'join', (user) =>
-          console.log 'join: ' + user
-          @peers << new Peer @signalingChannel, e.stream, user
+          unless user == @signalingChannel.getSocket().io.engine.id
+            console.log 'join: ' + user
+            remoteStream = new webkitMediaStream(e.stream)
+            console.log 'stream ids'
+            console.log e.stream
+            console.log remoteStream.id
+            @peers << new Peer @signalingChannel, remoteStream, user
 
     true
