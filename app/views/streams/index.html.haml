@@ -65,8 +65,3 @@
       stream = new Stream channel
       stream.createStream()
 
-    $('form#join').on 'submit', (e) ->
-      e.preventDefault()
-      channel = $('#join #channel').val()
-      stream = new Stream channel
-      stream.joinStream()

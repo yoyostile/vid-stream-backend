@@ -59,7 +59,8 @@ class @Peer
       # console.log desc
 
     @conn.createAnswer localDescCreated, (e) ->
-      # console.log 'answer: ' + e
+      console.log 'answer: '
+      console.log  e
 
   createOffer: (user) =>
     gotDescription = (desc) =>
@@ -74,18 +75,20 @@ class @Peer
     @connectedUser = user if @connectedUser == undefined
     console.log "connected to: " + @connectedUser
     msg = JSON.parse(msg.message)
-    # console.log 'messageReceived from ' + user
-    # console.log msg
-    # console.log 'connection status ' + @conn.iceConnectionState
-    # console.log 'Stream connected? ' + @streamConnected
+    console.log 'messageReceived from ' + user
+    console.log msg
+    console.log 'connection status ' + @conn.iceConnectionState
+    console.log 'Stream connected? ' + @streamConnected
     if user == @connectedUser
       if msg.sdp
+        console.log "SDP"
+        console.log msg.sdp
         @conn.setRemoteDescription new RTCSessionDescription(msg.sdp), =>
           if @conn.remoteDescription.type == 'offer'
             @user = user
             @createAnswer user
             @streamConnected = true
-      else if msg.candidate
+      else if msg.candidate && @conn.remoteDescription
         console.log 'added candidate for ' + user
         console.log msg.candidate
         @conn.addIceCandidate new RTCIceCandidate(msg.candidate)
@@ -94,6 +97,7 @@ class @Stream
   constructor: (streamName) ->
     @signalingChannel = new SignalingChannel
     @streamName = streamName
+    @socketId = ''
 
     @videoContainer = $('.video-container')[0]
     @peers = []
@@ -104,6 +108,7 @@ class @Stream
       video: true
     }, (stream) =>
       @signalingChannel.login @streamName
+      @socketId = @signalingChannel.getSocket().io.engine.id
       @videoContainer.src = URL.createObjectURL stream
       @videoContainer.play()
       # @conn.addStream stream
@@ -114,8 +119,9 @@ class @Stream
 
     console.log 'Adding join Listener to Socket'
     @signalingChannel.getSocket().on 'join', (user) =>
-      console.log 'join: ' + user
-      @peers << new Peer @signalingChannel, @stream, user
+      unless user.match @socketId
+        console.log 'join: ' + user
+        @peers << new Peer @signalingChannel, @stream, user
 
 
   joinStream: ->
@@ -128,6 +134,7 @@ class @Stream
       console.log msg
 
     broadcaster.getConnection().onaddstream = (e) =>
+      console.log e.stream
       if @videoContainer.src == ""
         @videoContainer.src = URL.createObjectURL e.stream
         @videoContainer.play()
