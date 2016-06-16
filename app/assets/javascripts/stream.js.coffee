@@ -32,6 +32,9 @@ class @Connection
   getConnection: ->
     @conn
 
+  iceConnectionState: ->
+    @conn.iceConnectionState
+
 
 class @Peer
   constructor: (signalingChannel, stream, user) ->
@@ -77,10 +80,10 @@ class @Peer
     @connectedUser = user if @connectedUser == undefined
     console.log "connected to: " + @connectedUser
     msg = JSON.parse(msg.message)
-    console.log 'messageReceived from ' + user
-    console.log msg
-    console.log 'connection status ' + @conn.iceConnectionState
-    console.log 'Stream connected? ' + @streamConnected
+    # console.log 'messageReceived from ' + user
+    # console.log msg
+    # console.log 'connection status ' + @conn.iceConnectionState
+    # console.log 'Stream connected? ' + @streamConnected
     if user == @connectedUser
       if msg.sdp
         # console.log "SDP"
@@ -99,7 +102,8 @@ class @Stream
   constructor: (streamName) ->
     @signalingChannel = new SignalingChannel
     @streamName = streamName
-    @socketId = ''
+    @socketId = @signalingChannel.getSocket().io.engine.id
+    console.log 'My ID: ' + @socketId
 
     @videoContainer = $('.video-container')[0]
     @peers = []
@@ -110,7 +114,6 @@ class @Stream
       video: true
     }, (stream) =>
       @signalingChannel.login @streamName
-      @socketId = @signalingChannel.getSocket().io.engine.id
       @videoContainer.src = URL.createObjectURL stream
       @videoContainer.play()
       # @conn.addStream stream
@@ -136,19 +139,18 @@ class @Stream
       console.log msg
 
     broadcaster.getConnection().onaddstream = (e) =>
-      console.log e.stream
       if @videoContainer.src == ""
         @videoContainer.src = URL.createObjectURL e.stream
         @videoContainer.play()
         console.log "Offering replicated Stream"
 
         @signalingChannel.getSocket().on 'join', (user) =>
-          unless user == @signalingChannel.getSocket().io.engine.id
+          unless user == @socketId
             console.log 'join: ' + user
             remoteStream = new webkitMediaStream(e.stream)
-            console.log 'stream ids'
-            console.log e.stream
-            console.log remoteStream.id
+            # console.log 'stream ids'
+            # console.log e.stream
+            # console.log remoteStream.id
             @peers << new Peer @signalingChannel, remoteStream, user
 
     true
