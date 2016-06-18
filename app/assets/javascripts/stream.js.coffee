@@ -124,6 +124,7 @@ class @Stream
 
     console.log 'Adding join Listener to Socket'
     @signalingChannel.getSocket().on 'join', (user) =>
+      return if Math.random() < 0.8 && @peers.length > 0
       unless user.match @socketId
         console.log 'join: ' + user
         @peers << new Peer @signalingChannel, @stream, user
