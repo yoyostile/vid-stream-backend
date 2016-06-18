@@ -144,13 +144,13 @@ class @Stream
         @videoContainer.play()
         console.log "Offering replicated Stream"
 
-        # @signalingChannel.getSocket().on 'join', (user) =>
-        #   unless user == @socketId
-        #     console.log 'join: ' + user
-        #     remoteStream = new webkitMediaStream(e.stream)
-        #     # console.log 'stream ids'
-        #     # console.log e.stream
-        #     # console.log remoteStream.id
-        #     @peers << new Peer @signalingChannel, remoteStream, user
+        @signalingChannel.getSocket().on 'join', (user) =>
+          unless user == @socketId
+            console.log 'join: ' + user
+            remoteStream = new webkitMediaStream(e.stream)
+            # console.log 'stream ids'
+            # console.log e.stream
+            # console.log remoteStream.id
+            @peers << new Peer @signalingChannel, remoteStream, user
 
     true
