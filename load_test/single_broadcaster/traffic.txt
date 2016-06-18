@@ -1,0 +1,14 @@
+Monitoring en0...    (press CTRL-C to stop)
+
+   getting traffic...                        rx:        7 kbit/s     3 p/s          tx:        9 kbit/s     3 p/s
+
+Monitoring en0...    (press CTRL-C to stop)
+
+   getting traffic...                        rx:        3 kbit/s     5 p/s          tx:        1 kbit/s     1 p/s                                                                          rx:        5 kbit/s     6 p/s          tx:        1 kbit/s     0 p/s                                                                          rx:        2 kbit/s     3 p/s          tx:        0 kbit/s     0 p/s
+
+Sampling en0 (5 seconds average)...                                   21 packets sampled in 5 seconds
+Traffic average for en0
+
+      rx         2.33 kbit/s             2 packets/s
+      tx         0.88 kbit/s             1 packets/s
+
