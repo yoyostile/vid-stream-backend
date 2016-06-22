@@ -1,0 +1,12 @@
+Sampling en0 (5 seconds average)...                                   3084 packets sampled in 5 seconds
+Traffic average for en0
+
+      rx        97.46 kbit/s            53 packets/s
+      tx         4.05 Mbit/s           563 packets/s
+
+Sampling en0 (5 seconds average)...                                   3086 packets sampled in 5 seconds
+Traffic average for en0
+
+      rx        65.63 kbit/s            74 packets/s
+      tx         4.09 Mbit/s           542 packets/s
+
